@@ -1,0 +1,431 @@
+<!-- Chosen Palette: "Japanese Zen" - Warm neutrals (Cream/Beige background), Sumi Ink (Dark Grey text), and Traditional Accents (Vermilion Red/Indigo Blue) for a calm, academic yet engaging atmosphere. -->
+
+<!-- Application Structure Plan:
+    1.  **Dashboard (Home) View:** A grid layout presenting the 10 Units as a syllabus.
+    2.  **Unit Detail View:** * **Point Section:** Optimized introduction (approx. 5 lines).
+        * **Reading Section:** "読み物" block with modern context (approx. 8 lines), styled with a blue border for distinction.
+        * **Objectives Tracker:** Interactive checkboxes for learning goals.
+        * **Vocabulary Bank:** Upgraded to 20 words per unit at JLPT N1 level as requested.
+        * **Question List:** All 10 Free Talking questions for exploration.
+    3.  **Analytics Dashboard:** Curriculum distribution and data visualizations.
+-->
+
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本語フリートーキング練習帳</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #fdfbf7; color: #2d3748; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); transition: all 0.3s ease; }
+        .card-shadow:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .btn-primary { background-color: #c53030; color: white; }
+        .btn-primary:hover { background-color: #9b2c2c; }
+        .tag-learned { background-color: #c6f6d5; color: #22543d; border-color: #9ae6b4; }
+        .question-item { transition: all 0.2s ease; border-left: 3px solid transparent; }
+        .question-item:hover { background-color: #fffaf0; border-left-color: #c53030; padding-left: 1.25rem; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="app.renderHome()">
+                <div class="w-8 h-8 bg-red-700 rounded-full flex items-center justify-center text-white font-bold text-sm">JP</div>
+                <h1 class="text-xl font-bold text-gray-800">日本語フリートーキング</h1>
+            </div>
+            <div class="flex space-x-4">
+                <button onclick="app.renderHome()" class="text-gray-600 hover:text-red-700 font-medium transition">ホーム</button>
+                <button onclick="app.renderAnalytics()" class="text-gray-600 hover:text-red-700 font-medium transition">分析と統計</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app-container" class="flex-grow container mx-auto px-4 py-8">
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-6 mt-12">
+        <div class="container mx-auto px-4 text-center text-sm">
+            <p>© 2026 日本語学習支援アプリ | Source: Free-Talking Japanese (Units 1-10)</p>
+            <p class="mt-2 text-gray-500">食生活 ・ 経済 ・ 文化 ・ 社会問題</p>
+        </div>
+    </footer>
+
+    <script>
+        const units = [
+            {
+                id: 1,
+                title: "食生活と健康",
+                icon: "🍱",
+                category: "生活・健康",
+                point: "現代社会のスピード化により、私たちの食生活は劇的な変化を遂げました。かつては家庭での食事が基本でしたが、今やスマートフォン一つでどんな料理も届く時代です。手軽に食べられるインスタント食品やデリバリーは非常に便利ですが、その反面、栄養の偏りや添加物の過剰摂取が深刻な問題となっています。私たちは健康な体を作るために、「何を食べるか」を真剣に考える必要があります。長寿社会において、食生活の管理はもはや個人の自由ではなく、人生の質を左右する重要な義務なのです。",
+                reading: "最近の日本では、タイパ（タイムパフォーマンス）を重視する若者が増えています。食事も時間をかけずに済ませたいという欲求から、完全栄養食やデリバリーサービスを利用するのが日常的な光景となりました。しかし、こうした効率重視の食生活は、知らず知らずのうちに胃腸に負担をかけ、心の健康までも損なう危険性があります。一方で、健康意識の高い人々の間では、オーガニック食材や植物性代替肉といった「ウェルビーイング」を意識した選択も広がっています。便利なツールを賢く使いながら、週末には自分で新鮮な食材を選び、ゆっくりと五感で味わう時間を持つことが大切です。バランスの取れた食生活こそが、ストレス社会を生き抜くための最強の武器となるからです。皆さんも、今日食べたものが10年後の自分を作っているという意識を持って、食事を楽しんでみてはいかがでしょうか。",
+                goals: ["インスタント食品の問題点を分析する。", "変則的な食生活から来る病気について発表する。", "どのような食生活をすれば健康を維持できるか考える。"],
+                vocab: ["懸念", "蔓延", "摂取", "阻害", "兆候", "蓄積", "弊害", "根絶", "享受", "脆弱", "補完", "是正", "促進", "維持", "過剰", "明白", "浸透", "一目瞭然", "不可欠", "必然"],
+                questions: ["アメリカ産農産物をどう思いますか。", "健康を考えるようになったきっかけは?", "インスタント食品をよく食べますか。", "あなたは偏食をしますか。", "健康食品には関心があるほうですか。", "あなたは健康を維持するためにどんな努力をしますか。", "食品に関して気をつけていることは?", "高麗人参はどんな効果がありますか。", "キムチにはどんな栄養分がありますか。", "長生きするためには、どんな食事管理が大切だと思いますか。"]
+            },
+            {
+                id: 2,
+                title: "豊かな生活とお金",
+                icon: "💰",
+                category: "経済・社会",
+                point: "資本主義社会において、お金は生存の手段であると同時に、成功の指標とも見なされています。より良い生活を求めるのは人間の本能ですが、その過程で「お金の亡者」となってしまう悲劇も後を絶ちません。一生懸命働くことの価値が問われる一方で、投資や資産運用で効率よく富を築くスタイルが注目されています。しかし、富を追求するあまりに人間としての誇りや他者への思いやりを忘れてしまっては本末転倒です。私たちはお金という道具に支配されるのではなく、それをどう使い、どう社会に還元するかを考えるべきです。",
+                reading: "近年、Z世代を中心に「FIRE（経済的自立と早期リタイア）」というライフスタイルが大きな注目を集めています。これは、若いうちに極力節約し、資産運用による不労所得で生活することを目指す考え方です。かつてのバブル経済時代のように、高級車やブランド品を誇示することに価値を置く人は減り、代わりに「自由な時間」や「精神的な自立」を求める傾向が強まっています。しかし、投資には必ずリスクが伴い、お金を増やすことだけに執着すると、かえって心の安らぎを失うこともあります。本来、お金は自分の夢を実現したり、大切な人を守ったりするための「手段」であるはずです。副業や投資のスキルを磨くことも重要ですが、それと同時に、いくらあれば自分は幸せになれるのかという基準を確立することが不可欠です。本当の豊かさとは、通帳の残高の多さではなく、お金によって得られる選択肢の広さと、その先にある心の満足感にあるのではないでしょうか。",
+                goals: ["「お金」の本来の使用目的について考える。", "「お金」にまつわるエピソードを聞く。", "人間としてどのように生きていくのが美しい生き方かを考える。"],
+                vocab: ["搾取", "掌握", "渇望", "還元", "歪曲", "露呈", "乖離", "富裕", "貧困", "格差", "投資", "融資", "循環", "債務", "利己的", "公益", "繁栄", "衰退", "資産", "負債"],
+                questions: ["あなたはお金持ちになりたいですか。", "月にいくらもらえれば満足できますか。", "クレジットカードについてどう思いますか。", "どうすればお金持ちになれますか。", "現在の経済の問題点は?", "経済大国に学ぶべき点は?", "「趣味・教養・社交費」の中で、真っ先に節約するのは何ですか。", "「お金・生命・愛」この中で一つ選ぶとしたら、どれを選びますか。", "宝くじで10億円当たったら、まず何に使いたいですか。", "「お金で幸せは買える」という意見に賛成ですか、反対ですか。"]
+            },
+            {
+                id: 3,
+                title: "喜びと余裕のある生活",
+                icon: "🏖️",
+                category: "生活・健康",
+                point: "現代社会の価値観は、「所有」から「体験」へと大きく移り変わりました。無理をして多額のローンを組み家を建てるよりも、レストランでの食事や海外旅行を満喫することに重きを置く人が増えています。ゆとりある生活は創造性を育み、精神的な安定をもたらす重要な要素です。歴史を振り返っても、偉大な文化や芸術は安定した政治と経済、それと人々の心に余裕があった時代に花開いてきました。私たちは「何のために働くのか」を問い直し、日々の生活を最高に楽しむための積極的な努力をすべきではないでしょうか。",
+                reading: "働き方改革が進む中で、場所を選ばずに仕事をする「ワーケーション」や、自宅でリラックスしながら過ごす「ステイケーション」が定着しました。かつては、休日を返上して働くことが美徳とされた時期もありましたが、今や適切な休息が仕事の質を向上させるという認識が一般的です。ソロキャンプや一人旅といった、誰에도 邪魔されない個人の時間を大切にする趣味もブームとなっています。しかし、真の余裕とは、単にスケジュールを空けることではなく、心の中にある「空白」をいかに楽しめるかという点にあります。SNSの通知をオフにし、目の前の景色や会話に集中する「デジタルデトックス」も、現代人には必要なスキルかもしれません。レジャーを通じて新しい自分に出会い、心を通わせるパートナーや仲間と感動を共有することで、人生の彩りは一層深まります。喜びを得るためには、待つのではなく自らアプローチし、環境を整える創造的な姿勢が求められています。限られた時間の中で、自分にとって最高の「憩いのひととき」をデザインすることが、現代を生きる知恵なのです。",
+                goals: ["最近の若者の生活意識について話し合う。", "理想的な労働条件について話し合う。", "レジャーの楽しみ方について話し合う。"],
+                vocab: ["謳歌", "充足", "弛緩", "涵養", "闊歩", "逍遥", "醍醐味", "満喫", "余暇", "創造", "潤滑", "活力", "安らぎ", "混沌", "秩序", "洗練", "素朴", "情緒", "感性", "共鳴"],
+                questions: ["韓国は休日が多いですか。(働きすぎですか)", "週休二日制の施行についてどう思いますか。", "休日は一人で休みたいですか。", "一ヶ月に休日が5日あるとしたら、どのように使いたいですか。", "若いときには時間とお金を何に費やしましたか。", "最近は主に何に費やしましたか。", "ハングリー精神が生み出すものは何でしょうか。", "自由や豊かさの中で花開いた文化や芸術作品は?", "一年間のリフレッシュ休暇がもらえたら、何をしますか。", "お金に余裕はなくても、それでもやりたいレジャーはなんですか。"]
+            },
+            {
+                id: 4,
+                title: "青春と学校教育",
+                icon: "🎓",
+                category: "教育・文化",
+                point: "思春期という多感な時期に、多くの若者は「受験戦争」という名の過酷なハードルに直面します。新しい知識を得る喜びよりも、順位や合格判定に追われる日々は、時として情緒的な発育を妨げるアイロニーを生み出します。勉強と恋愛、あるいは趣味のどちらを優先すべきかという悩みは、いつの時代も若者の心を揺さぶります。教育の本来の目的は、単なる知識の詰め込みではなく、自ら問いを立て、社会で生き抜くための力を養うことにあるはずです。青春時代のエネルギーを何にぶつけ、どのように自分を確立していくべきか、改めて考える必要があります。",
+                reading: "今の時代、教育の形は机の上だけにとどまりません。YouTubeやオンライン学習プラットフォームの普及により、学校に通わなくても専門的な知識やスキルを身につけることが可能になりました。かつてのように「一流大学を出て大企業に入る」ことが唯一の成功ルートだった時代は終わり、多様な生き方が認められるようになっています。しかし、依然として熾烈な受験競争が残っているのは、学閥や人脈が社会で大きな力を持ち続けているからかもしれません。若者がこれほどまでに勉強に縛られる現状は、彼らの創造性や未知の可能性を奪っているのではないかという懸念もあります。青春時代にしかできない失敗や、無駄だと思われるような没頭の時間は、実はAIには代替できない「人間らしさ」を育む貴重な財産です。私たちは、偏差値という一つの基準で若者を評価するのではなく、彼らがそれぞれの才能を自由に開花させられる環境を整えるべきです。勉強も恋愛も、どちらか一方を選ぶのではなく、両方を経験することで初めて、豊かでバランスの取れた大人の人格が形成されるのではないでしょうか。",
+                goals: ["得意だった科目と効果的な勉強法について説明する。", "「受験戦争」に対する各自の見解を述べる。", "自らの青春をふりかえる。"],
+                vocab: ["峻別", "陶冶", "模索", "淘汰", "葛藤", "啓発", "研鑽", "習得", "欠乏", "旺盛", "偏重", "是正", "資質", "潜在", "開花", "弊害", "克服", "達成", "志向", "均衡"],
+                questions: ["高校・大学受験のとき、どのように勉強しましたか。", "能率の上がる勉強法は? (朝型? 夜型?)", "学生時代、勉強したことを今でも覚えていますか。", "何が一番役立ったと思いますか。(科目)", "あなたのお父さん、お母さんは勉強にうるさいですか。", "現行の大学入試制度の問題点と解決案を考えてください。", "4年制大学で有利なこと、不利なことは何ですか。", "どんな学閥が形成されていますか。", "受験戦争は激しいですか。またその弊害は?", "勉強と恋愛とどちらが魅力的ですか。"]
+            },
+            {
+                id: 5,
+                title: "女性美は芸術か",
+                icon: "💄",
+                category: "文化・ジェンダー",
+                point: "「美人は得か損か」という問いは、いつの時代も議論の的となります。一般的に、美しい外見は社会的なアドバンテージと見なされがちですが、美しさは絶対的なものではなく、文化や時代によって変化するものです。女性は美しくなろうと多大な投資と努力を惜しみませんが、それは他人の評価のためでしょうか、それとも自分自身の満足のためでしょうか。ミス・コンテストのような普遍的な評価の場においても、単なる容姿だけでなく、知性や個性が問われるようになっています。本質的な美しさとはどこにあるのか、外面と内面の調和について深く考える必要があります。",
+                reading: "現代の美容業界は、「ボディポジティブ」という大きなうねりの中にあります。これは、特定の美の基準に縛られるのではなく、ありのままの自分の姿を愛そうという考え方です. SNSの普及により、洗練された画像が溢れる一方で、加工された美しさに疲れを感じ、自然体でいることの尊さを再確認する人も増えています。パーソナルカラー診断や骨格診断が流行しているのも、流行を追うだけでなく「自分に本当に似合うもの」を知りたいという欲求の表れでしょう。美しさはもはや、誰かと競うためのものではなく、自分自身を表現するための「自己肯定感」の源泉へと変化しています。化粧やファッションは、欠点を隠すための道具ではなく、自分の個性を際立たせるためのポジティブな投資であるべきです。知性や思いやりといった内面的な豊かさが、その人の表情や仕草に滲み出たとき、それはどんな宝石よりも輝く「美」となります。外面的なケアに励むのと同じくらいに、豊かな感性を磨き、自分だけの魅力を育む努力こそが、最も価値のある自分磨きだと言えるでしょう。本当の美しさとは、年齢とともに枯れていくものではなく、生き方そのものが反映された熟成していく芸術品なのです。",
+                goals: ["「女性美」とは何かについて考える。", "ミス・コンテストの審査基準についてそれぞれの意見を言う。", "西洋的美人と東洋的美人を比較する。"],
+                vocab: ["華麗", "繊細", "瀟洒", "崇高", "均整", "艶麗", "凌駕", "魅惑", "洗練", "普遍", "特殊", "観照", "陶酔", "感銘", "凛烈", "豊饒", "卓越", "荘厳", "優雅", "端正"],
+                questions: ["ミス・コンテストに関心がありますか。", "ミス・コリアの条件は? (身長、年齢)", "どこの出身がミス・コリアになる確率が高いと思いますか。", "審査員だとすると、どこに注目しますか。", "知性は関係がありますか。", "今までのミス・コリアで誰がいちばん好きですか。", "コンテストのどの場面がいちばん好きですか。", "ミス・コリアとミス・ジャパン、どっちがきれい?", "世界で女性がいちばん美しい国は?", "女性の美しさはどこにあると思いますか。"]
+            },
+            {
+                id: 6,
+                title: "読書と悪書追放",
+                icon: "📚",
+                category: "文化-教育",
+                point: "読書は人生を豊かにする素晴らしい習慣ですが、現代は情報過多の時代でもあります。書店には良書が並ぶ一方で、単なる刺激や快楽を追求した「悪書」も多く存在し、特に子供たちの健全な発育への影響が懸念されています。白紙のような心を持つ若者にとって、どのような本に触れるかは、その後の人格形成を左右する重要な分岐点となります。推薦図書の選定や悪書の追放は、単なる規制ではなく、子供たちの未来を守るための教育的な配慮です。私たちは氾濫する活字の中から、真に価値のある一冊を選び取る「情報の選別眼」を養わなければなりません。",
+                reading: "デジタル化の進展により、私たちの読書スタイルは劇的に変化しました。重いハードカバーを持ち歩かなくても、スマートフォンや電子書籍リーダー一台で何万冊もの本を持ち運べるようになり、オーディオブックで「聴く読書」を楽しむ人も増えています。しかし、その一方で「活字離れ」が深刻化し、短い文章やSNSの断片的な情報だけで満足してしまう傾向も強まっています。一冊の本とじっくり向き合い、作者の意図を汲み取りながら自分の頭で深く考える時間は、情報社会を生き抜くための「思考のスタミナ」を養う上で不可欠です。本の中での主人公との出会いや、作家が投げかけるメッセージは、時に一人の人間の運命を大きく変える力を持っています。良書は時空を超えて私たちに智恵を授け、未知の世界へと導いてくれる魔法の扉です。最近流行のウェブ漫画や短編小説도 面白いですが、たまには古典や難解な哲学書に挑戦し、自分の限界を超える知的な知的冒険を楽しんでみてはいかがでしょうか。読書を通じて培った豊かな感性と教養は、どんなに時代が変わっても色褪せることのない、あなただけの生涯の財産となるはずです。今、あなたの枕元にはどんな本が置かれていますか。",
+                goals: ["各自、感動した本・感銘を受けた本について話し合う。", "推薦図書と悪書の区別について話し合う。", "「活字ばなれ」の問題について話し合う。"],
+                vocab: ["読破", "叙述", "抄録", "遍歴", "陶酔", "翻弄", "洞察", "推敲", "該博", "出典", "論理", "飛躍", "帰結", "示唆", "普遍", "固有", "啓示", "洗礼", "珠玉", "感化"],
+                questions: ["一ケ月に何冊、本を読みますか。", "感動した小説BEST3をあげて下さい。", "いちばん感動した小説のストーリーを話して下さい。", "あなたの人生を大きく変えた小説は?", "その作家はどんな人ですか。", "その時あなたはどのように生きていきたいと思いましたか。", "最近の若者の活字離れ、漫画の増加についてどう思いますか。", "最近の話題作は?", "電車の中で日本人はマンガ、韓国人は新聞を読みますが、どうして?", "読書をする場所として、お気に入りの場所はありますか。"]
+            },
+            {
+                id: 7,
+                title: "「盗み」の問題",
+                icon: "🕵️",
+                category: "社会問題",
+                point: "「盗み」は人類が抱える永遠の課題であり、他者の権利を侵害する卑劣な行為です。それは単なる金銭的な損害だけでなく、社会の信頼という土台を根底から破壊してしまいます。「自分さえ良ければ相手が不幸になってもかまわない」という強い利己心が生み出すこの罪に対し、私たちは厳格な法的処罰だけでなく、根本的な人格教育の必要性を痛感しています。特にお腹が空いているといった切迫した状況下での「理性」の働きや、社会的弱者を狙った誘拐事件といった非人道的な犯罪の深層心理について、多角的な視点から議論を深めるべきです。",
+                reading: "現代社会における「盗み」の形は、物理的な物品からデジタルなデータへと広がり、より複雑化しています。フィッシング詐欺やSNSのなりすましといったサイバー犯罪は、姿の見えない泥棒による新しい脅威であり、私たちの日常生活の安全を脅かしています。また、置き配の荷物を盗むといった、便利さの隙を突いた犯罪も後を絶ちません。こうした犯罪が多発する背景には、格差社会の拡大やコミュニティの希薄化、そして「バレなければいい」という道徳観の欠如があるのかもしれません。かつては「人を見たら泥棒と思え」と言われましたが、常に他人を疑いながら生きる社会は非常に息苦しいものです。しかし、実際に被害に遭えば、その精神的なショックや不信感は長く尾を引きます。私たちは法による取り締まりを強化すると同時に、他者への共感力を育み、「正当な手段で富を得る」ことの尊さを教育を通じて伝えていく必要があります。誰かの物を盗むという行為は、実は自分自身の品格を最も深く傷つけるものであるという認識を持つべきです。信頼に基づいた社会を取り戻すために、私たち一人ひとりが高い倫理観を持ち、お互いの所有権を尊重し合える文化を醸成していかなければなりません。",
+                goals: ["「盗み」の深層心理を分析する。", "泥棒が増える社会的要因について考える。", "誘拐事件の非人間性と「罪意識」について話し合う。"],
+                vocab: ["隠蔽", "露見", "蹂躙", "処罰", "厳戒", "悔悟", "牽制", "憤慨", "脆弱", "過失", "故意", "謀略", "粛正", "壊滅", "更生", "贖罪", "糾弾", "抑止", "教訓", "戒め"],
+                questions: ["家に泥棒に入られたことがありますか。", "プロの泥棒はどんな家を狙いますか。", "家に帰って来た時、泥棒がいたら、どうしますか。", "理由を聞いて同情できる場合、その泥棒をどうしますか。", "「泥棒」がかわいそうだと思いますか。", "韓国で、有名な誘拐事件は何ですか。", "子供の誘拐事件の原因は?", "子供の誘拐事件の予防と対策は?", "泥棒や誘拐事件が多発するのは、社会にどんな問題があるからですか。", "デジタル時代の「著作権侵害（アイデアの盗用）」についてどう考えますか。"]
+            },
+            {
+                id: 8,
+                title: "喧嘩とストレス",
+                icon: "💢",
+                category: "社会・心理",
+                point: "喧嘩は利害の対立から生じるものですが、文化圏によってその作法や捉え方は大きく異なります。日本人は内向的で摩擦を避けようとする傾向がある一方、韓国人は外向的で感情をぶつけることで日頃のストレスを解消しようとする側面があると言われます。島国と半島という地理的な背景が、こうした対話スタイルの違いを生んだのかもしれません。「喧嘩両成敗」という日本の知恵もあれば、思想的に洗練された「無抵抗主義」も存在します。個人の葛藤から民族、宗教、そして国家間の戦争へと繋がる争いのメカニズムを、私たちは改めて冷静に分析しなければなりません。",
+                reading: "現代の喧嘩の主戦場は、現実の世界からSNS上へと移行し、いわゆる「炎上」や「アンチコメント」が深刻な社会問題となっています。顔의 見えない相手に対して感情を爆発させ、一度対立が始まれば、理性を失って相手を徹底的に攻撃する光景をよく見かけます。こうしたデジタルな喧嘩は、一時のストレス解消になるどころか、かえって精神的な疲弊を招き、修復不可能なダメージを相手に与えることもあります。喧嘩は本来、異なる価値観を持つ者同士が本音でぶつかり合い、相互理解を深めるための「通過儀礼」としての側面も持っていました。しかし、相手を打ち負かすことだけを目的にした争いからは、何も生まれません。大切なのは、感情的になりそうな時に一呼吸おき、相手の立場に立って考える余裕を持つことです。「喧嘩はしてもしこりは残さない」という賢い作法を身につけることが、ストレス社会を円満に生き抜くための鍵となります。夫婦喧嘩や友人との些細な言い合いであっても、それが単なる感情の爆発なのか、それともより良い関係を築くための対話なのかを自問すべきです。怒りのエネルギーを破壊ではなく、解決に向けた建設的な議論へと転換できる知恵こそが、今の私たちに最も必要とされているのです。",
+                goals: ["「喧嘩」に対する各自の考えを発表する。", "日本と韓国の「喧嘩」の違いについて話し合う。", "個人の心の葛藤から戦争までを考える。"],
+                vocab: ["応酬", "確執", "鎮撫", "妥協", "隠忍", "瓦解", "紛糾", "排斥", "融和", "不和", "扇動", "沈静", "膠着", "緩和", "妥当", "譲歩", "均衡", "崩壊", "破綻", "修復"],
+                questions: ["弱肉強食についてどう思いますか。", "あなたはよくけんかするほうですか。", "韓国人のけんかの作法は?", "「博愛主義」をどう思いますか。", "夫婦ゲンカはどちらが強いですか。", "ケンカを見たことがありますか. それはどんなけんかでした?", "ストレスが溜まったとき、あなたなりの解消法は何ですか。", "怒りを感じたとき、どのように自分を落ち着かせますか。", "インターネット上での「炎上」も現代の喧嘩の一種だと思いますか。", "平和な社会を築くために、個人ができることは何だと思いますか。"]
+            },
+            {
+                id: 9,
+                title: "お世辞と性格",
+                icon: "😊",
+                category: "心理・人間関係",
+                point: "人間関係を円滑に進めるための「言葉のサービス」として、お世辞や褒め言葉は非常に有効な潤滑油となります。褒められて嫌な気分になる人はおらず、肯定的な言葉は相手の自信を引き出し、ポジティブな雰囲気を作り出します。性格には様々なタイプがあり、血液型や心理テストで分類されることもありますが、大切なのは「相手を喜ばせたい」というサービス精神です。日本には「和をもって貴しとなす」という言葉がありますが、言葉一つで場が明るくなるのであれば、それは素晴らしいマナーと言えます. 自分の性格を客観的に見つめ、他者の魅力を積極的に見つけて言葉にすることは、より良い社会を築く第一歩です。",
+                reading: "最近の韓国や日本では、「MBTI」という性格診断テストが大流行し、初対面の挨拶代わりに自分のタイプを教え合うのが日常的な光景となりました。自分の思考パターンを分析し、他者の性格特性を理解しようとする姿勢は、人間関係の摩擦を減らす上で非常に有効なツールとなっています。しかし、血液型占いやMBTIという「枠組み」に相手を当てはめることが、時にその人の本来の魅力を曇らせてしまう危険性もあります。人の性格は12や16のタイプに収まりきるほど単純なものではなく、環境や経験によって常に変化し続ける「心の形」だからです。明るい人もいれば暗い人もいる、楽観的な人もいれば打算的な人もいる。そうした多様性こそが、社会をダイナミックで面白い場所にしています。自分と違うタイプを否定するのではなく、その違いを楽しみ、サービス精神を持って歩み寄ることが、成熟した大人の社交術です。鏡を見て外見を気にするのと同じくらい、自分の心の表情が他人にどう映っているかを意識し、魅力的な人柄を育む努力を怠ってはなりません。誰に対してもニコニコと接し、気前よく賞賛を送れる人は、どんなコミュニティにおいても幸福を引き寄せる磁石となります。皆さんの周りにいる「魅力的な人」は、一体どのような言葉を使い、どのような人生観を持っていますか。それを分析し、自分の中に取り入れていくことも、立派な自己研鑽の一つと言えるでしょう。",
+                goals: ["性格・表情の表現を覚える。", "魅力のある人について話し合う。", "自分の性格タイプを分析する。"],
+                vocab: ["謙虚", "傲慢", "猜疑", "闊達", "朴訥", "饒舌", "狡猾", "寛容", "狭量", "真摯", "虚飾", "露骨", "寡黙", "柔和", "剛毅", "卑屈", "高潔", "邪悪", "中庸", "執着"],
+                questions: ["人からどう見られているか、気になるほうですか。", "あなたの血液型は何型ですか。", "人と会う時、どんなところに気をつけますか。", "あなたはどんなタイプの人ですか。", "あなたのチャーム・ポイントは?", "あなたのタイプに合う人はどういう人?", "異性のどんなところに魅力を感じますか。", "同性のどんなところに魅力を感じますか。", "どんなタイプの人が一番幸せだと思う?", "愛は与えて忘れますか。"]
+            },
+            {
+                id: 10,
+                title: "親切とサービス精神",
+                icon: "🤝",
+                category: "社会・文化",
+                point: "日本人の親切さは、相手の立場に立って物事を考える「おもてなし」の精神に基づき、世界的に高く評価されています。道案内を頼めば目的地まで同行してくれるような親身な姿勢は、助け合いが生活化している証拠と言えるでしょう. しかし、相手を思いすぎるあまり、はっきり断れないといった日本特有の難しさも存在します。親切は人間関係を円満にする潤滑油であり、冷淡になりがちな現代社会において心の成長に欠かせない要素です。見返りを求めない純粋な善意こそが、最も強力な愛の形であり、社会を円満にする力となります。",
+                reading: "現代の都会では「隣近所に誰が住んでいるか分からない」という希薄な関係が当たり前になっていますが、そんな時代だからこそ、小さな親切の価値が再認識されています。重い荷物を持っている人に手を貸したり、電車で席を譲ったりする何気ない行為は、された側だけでなく、した側の心も温かくしてくれます. 最近では、クラウドファンディングやSNSを通じて、見ず知らずの人の夢や困窮を支援する「デジタルな親切」も広がっており、善意の形は多様化しています。しかし、本当のサービス精神とは、特別なイベントとして行うものではなく、日々のさりげない言葉遣いや表情の中に宿るものです。かつて「情けは人のためならず」と言われましたが、これは親切がいつか巡り巡って自分に返ってくるという合理的な智恵でもあります。相手を尊重し、心地よい環境を共に作り上げようとする姿勢が、殺伐とした人間関係を和らげ、信頼に基づいた豊かなコミュニティを再生させます。都会化が進み、世の中が物騒になったと言われる今だからこそ、私たちはあえて他者に対して心を開き、小さな「親切」を積み重ねていくべきです。それは自分自身が幸せに生きるための、最もシンプルで確実な方法だからです。皆さんは今日、誰かに親切にしましたか。あるいは、誰かの親切に気づきましたか。",
+                goals: ["「親切」が人間関係を円満にする役割について考える。", "親切にされた経験、不親切にされた経験について話し合う。", "「夫婦の愛」と「家庭サービス」について話し合う。"],
+                vocab: ["献身", "恭順", "丁重", "配慮", "懇切", "奉仕", "恩恵", "慈悲", "互恵", "遺憾", "痛切", "切実", "寛大", "謙遜", "慇懃", "無償", "徳行", "利他", "崇高", "永続"],
+                questions: ["あなたは親切にされたことが多いですか。", "日本人はサービスがいいと思いますか。", "韓国の女性は日本の女性より気が強いと思いますが、なぜですか。", "あなたは電車の中で席をゆずりますか。", "都会には人情がなくなってきましたか。", "人に親切にしたとき、どう感じますか。", "ことわざ「情けは人のためならず」とは、どういう意味ですか。", "あなたは親切にしたら見返りを期待しますか。"]
+            }
+        ];
+
+        const app = {
+            state: {
+                currentView: 'home',
+                currentUnitId: null,
+                learnedVocab: {},
+                completedGoals: {}
+            },
+
+            init: function() {
+                this.renderHome();
+            },
+
+            renderHome: function() {
+                this.state.currentView = 'home';
+                const container = document.getElementById('app-container');
+                let html = `
+                    <div class="mb-8 text-center">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">学習ユニット一覧</h2>
+                        <p class="text-gray-600">興味のあるトピックを選択して、日本語フリートーキング練習を始めましょう。</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                `;
+                units.forEach(unit => {
+                    html += `
+                        <div onclick="app.renderUnit(${unit.id})" class="bg-white rounded-xl p-6 card-shadow cursor-pointer border border-gray-100 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition text-6xl select-none grayscale">${unit.icon}</div>
+                            <div class="flex items-center mb-4">
+                                <span class="text-3xl mr-3">${unit.icon}</span>
+                                <div>
+                                    <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Unit ${unit.id}</span>
+                                    <h3 class="text-xl font-bold text-gray-800 leading-tight">${unit.title}</h3>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">${unit.point}</p>
+                            <div class="flex justify-between items-center mt-auto">
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">${unit.category}</span>
+                                <span class="text-sm text-red-600 font-medium group-hover:underline">学習を始める &rarr;</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+                window.scrollTo(0, 0);
+            },
+
+            renderUnit: function(id) {
+                this.state.currentView = 'unit';
+                this.state.currentUnitId = id;
+                const unit = units.find(u => u.id === id);
+                const container = document.getElementById('app-container');
+
+                const vocabHtml = unit.vocab.map(word => {
+                    const isLearned = this.state.learnedVocab[id] && this.state.learnedVocab[id].includes(word);
+                    return `<span onclick="app.toggleVocab('${word}', ${id})" class="inline-block px-3 py-1 rounded-full text-sm font-medium mr-2 mb-2 cursor-pointer transition select-none border ${isLearned ? 'tag-learned' : 'bg-white border-gray-300 text-gray-700 hover:border-red-400'}">${word} ${isLearned ? '✓' : ''}</span>`;
+                }).join('');
+
+                const goalsHtml = unit.goals.map((goal, idx) => {
+                    const isDone = this.state.completedGoals[id] && this.state.completedGoals[id].includes(idx);
+                    return `
+                        <div class="flex items-start mb-2 cursor-pointer hover:bg-gray-50 p-2 rounded" onclick="app.toggleGoal(${idx}, ${id})">
+                            <div class="flex-shrink-0 h-5 w-5 rounded border ${isDone ? 'bg-green-500 border-green-500' : 'border-gray-300'} flex items-center justify-center mr-3 mt-1 transition">
+                                ${isDone ? '<span class="text-white text-xs">✓</span>' : ''}
+                            </div>
+                            <p class="text-sm text-gray-700 ${isDone ? 'line-through text-gray-400' : ''}">${goal}</p>
+                        </div>
+                    `;
+                }).join('');
+
+                const questionsListHtml = unit.questions.map((q, idx) => `
+                    <div class="question-item bg-white p-4 mb-3 rounded-lg border border-gray-100 shadow-sm flex items-start">
+                        <span class="font-bold text-red-600 mr-4 mt-0.5 text-lg">${idx + 1}.</span>
+                        <p class="text-gray-800 text-lg leading-relaxed">${q}</p>
+                    </div>
+                `).join('');
+
+                container.innerHTML = `
+                    <div class="max-w-5xl mx-auto">
+                        <div class="flex items-center mb-6">
+                            <button onclick="app.renderHome()" class="mr-4 text-gray-500 hover:text-gray-800 text-sm font-bold flex items-center"><span class="mr-1">←</span> ホームに戻る</button>
+                            <span class="text-4xl mr-4">${unit.icon}</span>
+                            <div>
+                                <span class="text-red-600 font-bold uppercase text-sm tracking-wide">Unit ${unit.id}</span>
+                                <h2 class="text-3xl font-bold text-gray-800">${unit.title}</h2>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-2 space-y-6">
+                                <!-- Point Section -->
+                                <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-red-600">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                                        ポイント (導入)
+                                    </h3>
+                                    <p class="text-gray-700 leading-relaxed text-justify">${unit.point}</p>
+                                </div>
+
+                                <!-- Reading Section (読み物) - Blue Border -->
+                                <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-blue-600">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                                        読み物 (例文)
+                                    </h3>
+                                    <p class="text-gray-700 leading-relaxed text-justify">${unit.reading}</p>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center px-2">
+                                        <h3 class="text-xl font-bold text-gray-800">フリートーキング (質問リスト)</h3>
+                                        <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold">全${unit.questions.length}問</span>
+                                    </div>
+                                    <div class="space-y-2">
+                                        ${questionsListHtml}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="bg-white p-5 rounded-xl card-shadow sticky top-24">
+                                    <div class="mb-6">
+                                        <h3 class="text-md font-bold text-gray-800 mb-3 border-b pb-2">学習目標</h3>
+                                        <div>${goalsHtml}</div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-md font-bold text-gray-800 mb-3 border-b pb-2 flex justify-between items-center">
+                                            <span>重要語彙 (N1レベル)</span>
+                                            <span class="text-xs text-gray-400 font-normal">習得チェック</span>
+                                        </h3>
+                                        <div class="flex flex-wrap" id="vocab-container">${vocabHtml}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                window.scrollTo(0, 0);
+            },
+
+            renderAnalytics: function() {
+                this.state.currentView = 'analytics';
+                const container = document.getElementById('app-container');
+                const vocabCounts = units.map(u => u.vocab.length);
+                const labels = units.map(u => `Unit ${u.id}`);
+                const titles = units.map(u => u.title);
+                const categories = {};
+                units.forEach(u => categories[u.category] = (categories[u.category] || 0) + 1);
+
+                container.innerHTML = `
+                    <div class="max-w-4xl mx-auto">
+                        <div class="text-center mb-10">
+                            <h2 class="text-3xl font-bold text-gray-800">学習コンテンツ分析</h2>
+                            <p class="text-gray-600 mt-2">教材の構造とバランスを可視化します。</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-white p-6 rounded-xl card-shadow">
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">ユニット別 重要語彙数</h3>
+                                <div class="chart-container"><canvas id="vocabChart"></canvas></div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl card-shadow">
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">テーマ分野別構成</h3>
+                                <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="mt-8 bg-white p-6 rounded-xl card-shadow overflow-x-auto">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">カリキュラム概要</h3>
+                            <table class="min-w-full text-sm text-left text-gray-600">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3">Unit</th>
+                                        <th class="px-6 py-3">タイトル</th>
+                                        <th class="px-6 py-3">カテゴリー</th>
+                                        <th class="px-6 py-3 text-center">語彙数</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${units.map(u => `
+                                        <tr class="bg-white border-b hover:bg-gray-50">
+                                            <td class="px-6 py-4 font-medium text-gray-900">${u.id}</td>
+                                            <td class="px-6 py-4">${u.title}</td>
+                                            <td class="px-6 py-4"><span class="px-2 py-1 bg-gray-100 rounded-full text-xs">${u.category}</span></td>
+                                            <td class="px-6 py-4 text-center">${u.vocab.length}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    new Chart(document.getElementById('vocabChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '語彙数',
+                                data: vocabCounts,
+                                backgroundColor: 'rgba(44, 82, 130, 0.6)',
+                                borderColor: 'rgba(44, 82, 130, 1)',
+                                borderWidth: 1,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+                    new Chart(document.getElementById('categoryChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(categories),
+                            datasets: [{
+                                data: Object.values(categories),
+                                backgroundColor: ['#c53030', '#2c5282', '#d69e2e', '#38a169', '#805ad5'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }, 100);
+            },
+
+            toggleVocab: function(word, unitId) {
+                if (!this.state.learnedVocab[unitId]) this.state.learnedVocab[unitId] = [];
+                const idx = this.state.learnedVocab[unitId].indexOf(word);
+                if (idx > -1) this.state.learnedVocab[unitId].splice(idx, 1);
+                else this.state.learnedVocab[unitId].push(word);
+                
+                const unit = units.find(u => u.id === unitId);
+                document.getElementById('vocab-container').innerHTML = unit.vocab.map(w => {
+                    const isLearned = this.state.learnedVocab[unitId].includes(w);
+                    return `<span onclick="app.toggleVocab('${w}', ${unitId})" class="inline-block px-3 py-1 rounded-full text-sm font-medium mr-2 mb-2 cursor-pointer transition select-none border ${isLearned ? 'tag-learned' : 'bg-white border-gray-300 text-gray-700 hover:border-red-400'}">${w} ${isLearned ? '✓' : ''}</span>`;
+                }).join('');
+            },
+
+            toggleGoal: function(goalIndex, unitId) {
+                if (!this.state.completedGoals[unitId]) this.state.completedGoals[unitId] = [];
+                const idx = this.state.completedGoals[unitId].indexOf(goalIndex);
+                if (idx > -1) this.state.completedGoals[unitId].splice(idx, 1);
+                else this.state.completedGoals[unitId].push(goalIndex);
+                this.renderUnit(unitId);
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+</html>
